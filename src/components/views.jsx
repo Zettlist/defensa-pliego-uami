@@ -2,10 +2,14 @@ import { useMemo } from 'react';
 import Rich, { Hl } from './Rich.jsx';
 import Collapsible from './Collapsible.jsx';
 import useFolds from './useFolds.js';
-import { IconCollapse, IconExpand, IconLeft, IconRight } from './icons.jsx';
+import { IconCheck, IconCollapse, IconExpand, IconLeft, IconRight } from './icons.jsx';
 import { ejeLabel, hasAll, hasAny, norm, paras, parseVerificacion, slug, verdictOf } from '../lib.js';
 
 const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
+
+export function DoneBadge({ className = '' }) {
+  return <span className={`done-badge ${className}`}><IconCheck width={13} height={13} />Cumplido</span>;
+}
 
 function FoldTools({ folds }) {
   return (
@@ -50,10 +54,13 @@ export function Overview({ data, e, ix, terms, headRef }) {
         <ol className="ov-list">
           {rows.map(({ p }, i) => (
             <li key={p.pid} style={{ '--i': i }}>
-              <a className="ov-row" href={`#${e.id}-${slug(p.pid)}`}>
+              <a className={`ov-row ${e.cumplidos?.has(p.pid) ? 'is-done' : ''}`} href={`#${e.id}-${slug(p.pid)}`}>
                 <span className="ov-pid">{p.pid}</span>
                 <span className="ov-main">
-                  <Hl className="ov-res" text={p.resumen} terms={terms} />
+                  <span className="ov-res-w">
+                    {e.cumplidos?.has(p.pid) && <DoneBadge />}
+                    <Hl className="ov-res" text={p.resumen} terms={terms} />
+                  </span>
                   <span className="ov-min">
                     <span className="ov-min-l">Mínimo aceptable</span>
                     {p.minimo
@@ -95,18 +102,20 @@ export function Point({ e, ix, idx, terms, mesa, headRef }) {
   const folds = useFolds(keys, matchKeys, terms.join(' '));
   const prev = e.puntos[idx - 1];
   const next = e.puntos[idx + 1];
+  const done = e.cumplidos?.has(p.pid);
 
   return (
-    <article className={`view point ${mesa ? 'is-mesa' : ''}`}>
+    <article className={`view point ${mesa ? 'is-mesa' : ''} ${done ? 'is-done' : ''}`}>
       <ViewHead e={e} eyebrow={`${ejeLabel(e)} · ${e.title} · punto ${idx + 1} de ${e.puntos.length}`} title={
         <><span className="pt-pid">{p.pid}</span><Hl className="pt-res" text={p.resumen} terms={terms} /></>
       } headRef={headRef}>
         <nav className="pt-track" aria-label="Puntos del eje">
           {e.puntos.map((q, j) => (
-            <a key={q.pid} href={`#${e.id}-${slug(q.pid)}`} className={j === idx ? 'is-cur' : j < idx ? 'is-past' : ''}
-              aria-label={`Punto ${q.pid}`} aria-current={j === idx ? 'page' : undefined} title={`${q.pid} · ${q.resumen}`} />
+            <a key={q.pid} href={`#${e.id}-${slug(q.pid)}`} className={`${j === idx ? 'is-cur' : j < idx ? 'is-past' : ''} ${e.cumplidos?.has(q.pid) ? 'is-done' : ''}`}
+              aria-label={`Punto ${q.pid}${e.cumplidos?.has(q.pid) ? ' (cumplido)' : ''}`} aria-current={j === idx ? 'page' : undefined} title={`${q.pid} · ${q.resumen}`} />
           ))}
         </nav>
+        {done && <p className="done-note"><DoneBadge /> Este punto ya se cumplió. Se conserva como referencia.</p>}
       </ViewHead>
 
       {!mesa && keys.length > 0 && <FoldTools folds={folds} />}

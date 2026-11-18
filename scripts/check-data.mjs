@@ -42,6 +42,19 @@ for (const e of d.ejes || []) {
     if (!citas[m[1]]) errors.push(`${where}: la cita ${m[1]} se usa en el HTML pero no está en "citas".`);
   }
 }
+// estado.json (opcional): cada punto marcado como cumplido debe existir en data.json.
+try {
+  const st = JSON.parse(readFileSync(new URL('../public/estado.json', import.meta.url), 'utf8'));
+  for (const [eid, list] of Object.entries(st.cumplidos || {})) {
+    const e = (d.ejes || []).find((x) => x.id === eid);
+    if (!e) { errors.push(`estado.json: el eje "${eid}" no existe en data.json.`); continue; }
+    if (!Array.isArray(list)) { errors.push(`estado.json: "cumplidos.${eid}" debe ser una lista.`); continue; }
+    for (const pid of list) if (!e.puntos.some((p) => p.pid === pid)) errors.push(`estado.json: el punto ${pid} no existe en ${eid}.`);
+  }
+} catch (err) {
+  if (err.code !== 'ENOENT') errors.push('estado.json no es JSON válido: ' + err.message);
+}
+
 const unused = Object.keys(citas).filter((k) => !used.has(k));
 if (unused.length) warns.push(`${unused.length} citas definidas no se usan en ningún botón (no es un problema).`);
 

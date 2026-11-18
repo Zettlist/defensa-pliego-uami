@@ -16,11 +16,12 @@ export function Sidebar({ e, ix, view, terms, counts, other, otherCounts }) {
       <ul className="side-list">
         {pts.map(({ p, hit }) => {
           const cur = view === slug(p.pid);
+          const done = e.cumplidos?.has(p.pid);
           return (
             <li key={p.pid} className={searching && !hit ? 'is-dim' : ''}>
-              <a className={`side-pt ${cur ? 'is-cur' : ''}`} href={`#${e.id}-${slug(p.pid)}`} aria-current={cur ? 'page' : undefined}>
+              <a className={`side-pt ${cur ? 'is-cur' : ''} ${done ? 'is-done' : ''}`} href={`#${e.id}-${slug(p.pid)}`} aria-current={cur ? 'page' : undefined}>
                 <span className="side-pid">{p.pid}</span>
-                <span className="side-res">{p.resumen}</span>
+                <span className="side-res">{done && <span className="side-done">Cumplido · </span>}{p.resumen}</span>
                 {searching && hit && <span className="dot" aria-label="coincide" />}
               </a>
             </li>
@@ -61,7 +62,7 @@ export function MobileNav({ e, view, onGo }) {
         <option value="inicio">Resumen para la mesa</option>
         <optgroup label="Puntos del pliego">
           {e.puntos.map((p) => (
-            <option key={p.pid} value={slug(p.pid)}>{p.pid} · {p.resumen.length > 60 ? p.resumen.slice(0, 58) + '…' : p.resumen}</option>
+            <option key={p.pid} value={slug(p.pid)}>{p.pid} · {e.cumplidos?.has(p.pid) ? '[Cumplido] ' : ''}{p.resumen.length > 60 ? p.resumen.slice(0, 58) + '…' : p.resumen}</option>
           ))}
         </optgroup>
         <optgroup label="Panorama">

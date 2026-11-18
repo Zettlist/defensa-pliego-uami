@@ -1,0 +1,7 @@
+{
+  "nota": "Puntos ya cumplidos por la autoridad. Se mantiene aparte de data.json para que no se pierda al publicar un data.json nuevo.",
+  "cumplidos": {
+    "eje1": ["1.1.a", "1.1.b", "1.1.c", "1.1.d", "1.1.e", "1.1.f"],
+    "eje3": []
+  }
+}

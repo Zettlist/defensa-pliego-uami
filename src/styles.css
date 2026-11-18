@@ -571,3 +571,26 @@ html.mesa .mesa-block .prose { font-size: 1.06rem; }
   .main { padding: 0; }
   .fold-body { grid-template-rows: 1fr !important; opacity: 1 !important; }
 }
+
+/* ---------- Puntos cumplidos (estado.json) ---------- */
+.done-badge {
+  display: inline-flex; align-items: center; gap: 4px; flex: none;
+  font: 650 .68rem/1 var(--sans); letter-spacing: .06em; text-transform: uppercase;
+  color: var(--min); background: var(--min-soft); border: 1px solid var(--min-line);
+  padding: 4px 8px 4px 6px; border-radius: 999px; vertical-align: middle;
+}
+.ov-res-w { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.ov-row.is-done .ov-pid { color: var(--min); }
+.ov-row.is-done .ov-res, .ov-row.is-done .ov-min-t { color: var(--ink-3); }
+.ov-row.is-done .ov-min { border-left-color: var(--line); }
+.ov-row.is-done .ov-min-l { color: var(--ink-3); }
+.side-pt.is-done .side-pid { color: var(--min); }
+.side-pt.is-done .side-res { color: var(--ink-3); }
+.side-done { color: var(--min); font-weight: 650; }
+.pt-track a.is-done { background: var(--min-line); }
+.pt-track a.is-done.is-cur { background: var(--min); }
+.point.is-done .pt-pid { color: var(--min); }
+.done-note {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 14px 0 0;
+  font-size: .92rem; color: var(--ink-2);
+}

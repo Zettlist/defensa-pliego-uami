@@ -27,7 +27,7 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
 
-  const networkFirst = req.mode === 'navigate' || url.pathname.endsWith('/data.json') || url.pathname.endsWith('.html');
+  const networkFirst = req.mode === 'navigate' || url.pathname.endsWith('/data.json') || url.pathname.endsWith('/estado.json') || url.pathname.endsWith('.html');
   if (networkFirst) {
     // Clave sin query ni hash; 'no-cache' revalida con el servidor (nunca una copia vieja del navegador).
     const key = url.origin + url.pathname;
