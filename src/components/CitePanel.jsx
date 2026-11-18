@@ -36,9 +36,14 @@ export default function CitePanel({ cite, citas, onClose }) {
   if (!cite) return null;
   const d = citas[cite.k] || {};
   const isDrive = cite.s === 'drive';
-  const btn = isDrive
+  // Drive: si el enlace es de una carpeta, se dice; si es de un archivo, se abre el documento.
+  // El visor de Drive no salta a una página, así que la página se indica en el texto.
+  const isFolder = isDrive && /\/folders\//.test(cite.u || '');
+  const btn = isFolder
     ? 'Abrir la carpeta del 23-oct en Google Drive'
-    : cite.p ? `Abrir el documento original en la página ${cite.p}` : 'Abrir el documento original';
+    : isDrive
+      ? (cite.p ? `Abrir el documento en Google Drive (ir a la página ${cite.p})` : 'Abrir el documento en Google Drive')
+      : cite.p ? `Abrir el documento original en la página ${cite.p}` : 'Abrir el documento original';
 
   return (
     <div className="cite-layer">
