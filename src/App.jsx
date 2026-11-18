@@ -2,6 +2,7 @@ import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } f
 import { Sidebar, MobileNav } from './components/Nav.jsx';
 import { Overview, Point, Debilidades, Verificacion, Glosario, Advertencias } from './components/views.jsx';
 import CitePanel from './components/CitePanel.jsx';
+import { ScrollProgress } from './components/fx.jsx';
 import { IconClose, IconSearch } from './components/icons.jsx';
 import { VIEWS, buildIndex, countMatches, ejeLabel, parseHash, slug, termsOf } from './lib.js';
 
@@ -105,11 +106,18 @@ export default function App({ data }) {
       <header className="top">
         <div className="top-in">
           <a className="brand" href={`#${e.id}-inicio`}>
+            <span className="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5" /><path d="m9 14 2 2 4-4" /></svg>
+            </span>
+            <span className="brand-txt">
             <span className="brand-t">Defensa del pliego petitorio</span>
             <span className="brand-s">UAM Iztapalapa · Mesa del {data.mesa} · Actualizado {data.fecha}</span>
+            </span>
           </a>
 
-          <div className="seg" role="group" aria-label="Eje">
+          <div className="seg" role="group" aria-label="Eje"
+            style={{ '--n': data.ejes.length, '--idx': Math.max(0, data.ejes.findIndex((x) => x.id === e.id)) }}>
+            <span className="seg-ind" aria-hidden="true" />
             {data.ejes.map((x) => (
               <button key={x.id} type="button" aria-pressed={x.id === e.id} title={x.title}
                 onClick={() => go('inicio', x.id)}>
@@ -136,6 +144,7 @@ export default function App({ data }) {
             <span>Modo mesa</span>
           </button>
         </div>
+        <ScrollProgress />
       </header>
 
       <MobileNav e={e} view={route.view} onGo={(v) => go(v)} />

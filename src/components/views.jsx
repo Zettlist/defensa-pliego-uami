@@ -3,6 +3,7 @@ import Rich, { Hl } from './Rich.jsx';
 import Collapsible from './Collapsible.jsx';
 import useFolds from './useFolds.js';
 import { IconCollapse, IconExpand, IconLeft, IconRight } from './icons.jsx';
+import { CountUp } from './fx.jsx';
 import { ejeLabel, hasAll, hasAny, norm, paras, parseVerificacion, slug, verdictOf } from '../lib.js';
 
 const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
@@ -16,9 +17,9 @@ function FoldTools({ folds }) {
   );
 }
 
-function ViewHead({ e, eyebrow, title, children, headRef }) {
+function ViewHead({ e, eyebrow, title, children, headRef, className = '' }) {
   return (
-    <header className="view-head">
+    <header className={`view-head ${className}`}>
       <p className="eyebrow">{eyebrow || `${ejeLabel(e)} · ${e.title}`}</p>
       <h1 className="view-title" tabIndex={-1} ref={headRef}>{title}</h1>
       {children}
@@ -40,11 +41,11 @@ export function Overview({ data, e, ix, terms, headRef }) {
 
   return (
     <div className="view">
-      <ViewHead e={e} eyebrow={`Mesa de diálogo · ${data.mesa}`} title={e.full || e.title} headRef={headRef}>
+      <ViewHead className="hero" e={e} eyebrow={`Mesa de diálogo · ${data.mesa}`} title={e.full || e.title} headRef={headRef}>
         <dl className="stats">
-          <div><dt>Puntos del pliego</dt><dd>{e.puntos.length}</dd></div>
-          <div><dt>Debilidades expuestas</dt><dd>{e.debilidades.length}</dd></div>
-          <div><dt>Citas con página</dt><dd>{nCitas}</dd></div>
+          <div><dt>Puntos del pliego</dt><dd><CountUp value={e.puntos.length} /></dd></div>
+          <div><dt>Debilidades expuestas</dt><dd><CountUp value={e.debilidades.length} /></dd></div>
+          <div><dt>Citas con página</dt><dd><CountUp value={nCitas} /></dd></div>
         </dl>
       </ViewHead>
 
@@ -55,8 +56,8 @@ export function Overview({ data, e, ix, terms, headRef }) {
         </div>
         {searching && !rows.length && <NoResults what="los puntos" />}
         <ol className="ov-list">
-          {rows.map(({ p }) => (
-            <li key={p.pid}>
+          {rows.map(({ p }, i) => (
+            <li key={p.pid} style={{ '--i': i }}>
               <a className="ov-row" href={`#${e.id}-${slug(p.pid)}`}>
                 <span className="ov-pid">{p.pid}</span>
                 <span className="ov-main">
@@ -107,7 +108,14 @@ export function Point({ e, ix, idx, terms, mesa, headRef }) {
     <article className={`view point ${mesa ? 'is-mesa' : ''}`}>
       <ViewHead e={e} eyebrow={`${ejeLabel(e)} · ${e.title} · punto ${idx + 1} de ${e.puntos.length}`} title={
         <><span className="pt-pid">{p.pid}</span><Hl className="pt-res" text={p.resumen} terms={terms} /></>
-      } headRef={headRef} />
+      } headRef={headRef}>
+        <nav className="pt-track" aria-label="Puntos del eje">
+          {e.puntos.map((q, j) => (
+            <a key={q.pid} href={`#${e.id}-${slug(q.pid)}`} className={j === idx ? 'is-cur' : j < idx ? 'is-past' : ''}
+              aria-label={`Punto ${q.pid}`} aria-current={j === idx ? 'page' : undefined} title={`${q.pid} · ${q.resumen}`} />
+          ))}
+        </nav>
+      </ViewHead>
 
       {!mesa && keys.length > 0 && <FoldTools folds={folds} />}
 
@@ -131,8 +139,8 @@ export function Point({ e, ix, idx, terms, mesa, headRef }) {
 
       {mesa ? (
         <div className="mesa-blocks">
-          {secs.filter((s) => s.k === 'rep' || s.k === 'cri').map((s) => (
-            <section className={`mesa-block mb-${s.k}`} key={s.k} aria-labelledby={`mb-${s.k}`}>
+          {secs.filter((s) => s.k === 'rep' || s.k === 'cri').map((s, i) => (
+            <section className={`mesa-block mb-${s.k}`} key={s.k} style={{ '--i': i + 2 }} aria-labelledby={`mb-${s.k}`}>
               <h2 className="block-label" id={`mb-${s.k}`}>{s.title}</h2>
               <Rich className="prose" html={p[s.k]} terms={terms} />
             </section>
@@ -140,9 +148,10 @@ export function Point({ e, ix, idx, terms, mesa, headRef }) {
         </div>
       ) : (
         <div className="folds">
-          {secs.map((s) => (
+          {secs.map((s, i) => (
             <Collapsible
               key={s.k}
+              style={{ '--i': i }}
               title={s.title}
               meta={s.n && p[s.n] != null ? plural(p[s.n], 'cita', 'citas') : null}
               open={folds.isOpen(s.k)}
@@ -193,7 +202,7 @@ export function Debilidades({ e, ix, terms, headRef }) {
       {searching && !items.length && <NoResults what="las debilidades" />}
       <ol className="cards">
         {items.map(({ c, i }) => (
-          <li className="card" key={i}>
+          <li className="card" key={i} style={{ '--i': i }}>
             <p className="card-n">{String(i + 1).padStart(2, '0')}</p>
             <Rich as="h2" className="card-t" html={c.t} terms={terms} />
             <Rich className="card-b prose" html={c.b} terms={terms} />
@@ -237,11 +246,11 @@ export function Verificacion({ e, terms, headRef }) {
           <FoldTools folds={folds} />
           {searching && !matchKeys.length && <NoResults what="la verificación" />}
           <div className="folds">
-            {groups.map((g) => {
+            {groups.map((g, gi) => {
               const rows = searching ? g.rows.filter((r) => hasAll(r.text, terms)) : g.rows;
               if (searching && !rows.length) return null;
               return (
-                <Collapsible key={g.group} title={<><span className={`vdot v-${g.cls}`} aria-hidden="true" />{g.group}</>} meta={plural(rows.length, 'cita', 'citas')} open={folds.isOpen(g.group)} onToggle={() => folds.toggle(g.group)} level={2} hit={searching}>
+                <Collapsible key={g.group} style={{ '--i': gi }} title={<><span className={`vdot v-${g.cls}`} aria-hidden="true" />{g.group}</>} meta={plural(rows.length, 'cita', 'citas')} open={folds.isOpen(g.group)} onToggle={() => folds.toggle(g.group)} level={2} hit={searching}>
                   <table className="vt">
                     {parsed.head && (
                       <thead><tr>{parsed.head.map((h, i) => <th key={i} scope="col">{h}</th>)}</tr></thead>
@@ -294,7 +303,7 @@ export function Glosario({ e, ix, terms, headRef }) {
         {visible.map(({ g, i, items }) => {
           if (searching && !items.length) return null;
           return (
-            <Collapsible key={i} title={<Rich as="span" html={g.g} terms={terms} />} meta={plural(items.length, 'término', 'términos')} open={folds.isOpen('g' + i)} onToggle={() => folds.toggle('g' + i)} level={2} hit={matchKeys.includes('g' + i)}>
+            <Collapsible key={i} style={{ '--i': i }} title={<Rich as="span" html={g.g} terms={terms} />} meta={plural(items.length, 'término', 'términos')} open={folds.isOpen('g' + i)} onToggle={() => folds.toggle('g' + i)} level={2} hit={matchKeys.includes('g' + i)}>
               {g.nota && <Rich as="p" className="note" html={g.nota} terms={terms} />}
               <dl className="glos">
                 {items.map(({ it, j }) => (
@@ -338,7 +347,7 @@ export function Advertencias({ e, ix, terms, headRef }) {
       {searching && !items.length && <NoResults what="las advertencias" />}
       <ol className="adv">
         {items.map(({ i, head, body }) => (
-          <li key={i} className="adv-item">
+          <li key={i} className="adv-item" style={{ '--i': i }}>
             <span className="adv-n" aria-hidden="true">{i + 1}</span>
             {body ? (
               <Collapsible title={<Rich as="span" html={head} terms={terms} />} open={folds.isOpen('a' + i)} onToggle={() => folds.toggle('a' + i)} level={2} hit={matchKeys.includes('a' + i)} className="fold-adv">

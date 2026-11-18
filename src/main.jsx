@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import '@fontsource-variable/public-sans';
 import '@fontsource-variable/source-serif-4';
 import './styles.css';
+import './motion.css';
 import App from './App.jsx';
 
 const root = createRoot(document.getElementById('root'));
