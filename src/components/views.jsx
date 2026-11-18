@@ -3,7 +3,6 @@ import Rich, { Hl } from './Rich.jsx';
 import Collapsible from './Collapsible.jsx';
 import useFolds from './useFolds.js';
 import { IconCollapse, IconExpand, IconLeft, IconRight } from './icons.jsx';
-import { CountUp } from './fx.jsx';
 import { ejeLabel, hasAll, hasAny, norm, paras, parseVerificacion, slug, verdictOf } from '../lib.js';
 
 const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
@@ -36,18 +35,11 @@ function NoResults({ what }) {
 export function Overview({ data, e, ix, terms, headRef }) {
   const searching = terms.length > 0;
   const rows = e.puntos.map((p, i) => ({ p, hit: hasAll(ix.puntos[i].all, terms) })).filter((r) => !searching || r.hit);
-  const nCitas = Object.keys(data.citas).filter((k) => k.startsWith(e.code + ':')).length;
   const folds = useFolds(['intro'], hasAny(ix.intro, terms) ? ['intro'] : [], terms.join(' '));
 
   return (
     <div className="view">
-      <ViewHead className="hero" e={e} eyebrow={`Mesa de diálogo · ${data.mesa}`} title={e.full || e.title} headRef={headRef}>
-        <dl className="stats">
-          <div><dt>Puntos del pliego</dt><dd><CountUp value={e.puntos.length} /></dd></div>
-          <div><dt>Debilidades expuestas</dt><dd><CountUp value={e.debilidades.length} /></dd></div>
-          <div><dt>Citas con página</dt><dd><CountUp value={nCitas} /></dd></div>
-        </dl>
-      </ViewHead>
+      <ViewHead className="hero" e={e} eyebrow={`Mesa de diálogo · ${data.mesa}`} title={e.full || e.title} headRef={headRef} />
 
       <section aria-labelledby="ov-h">
         <div className="sec-head">
