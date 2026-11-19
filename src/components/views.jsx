@@ -98,7 +98,7 @@ export function Point({ data, e, ix, idx, terms, mesa, headRef }) {
   const p = e.puntos[idx];
   const f = ix.puntos[idx].f;
   const secs = SECTIONS.filter((s) => p[s.k]);
-  const keys = [...(p.grupo?.length ? ['grupo'] : []), ...secs.map((s) => s.k)];
+  const keys = [...(p.grupo?.length ? ['grupo'] : []), ...secs.map((s) => s.k), ...(p.checklist ? ['checklist'] : [])];
   const matchKeys = keys.filter((k) => hasAny(f[k], terms));
   const folds = useFolds(keys, matchKeys, terms.join(' '));
   const prev = e.puntos[idx - 1];
@@ -168,7 +168,10 @@ export function Point({ data, e, ix, idx, terms, mesa, headRef }) {
         </div>
       )}
 
-      {p.checklist && <Checklist checklist={p.checklist} pid={p.pid} data={data} />}
+      {p.checklist && (
+        <Checklist checklist={p.checklist} pid={p.pid} data={data}
+          open={folds.isOpen('checklist')} onToggle={() => folds.toggle('checklist')} hit={matchKeys.includes('checklist')} />
+      )}
 
       <nav className="pager" aria-label="Puntos">
         {prev ? (

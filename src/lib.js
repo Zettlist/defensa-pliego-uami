@@ -54,6 +54,14 @@ export const hasAll = (s, terms) => terms.length > 0 && terms.every((t) => s.inc
 export const hasAny = (s, terms) => terms.length > 0 && terms.some((t) => s.includes(t));
 
 /** Índice de búsqueda: texto normalizado de cada campo, calculado una sola vez. */
+// Solo los valores de texto de un objeto (sin nombres de campos), para indexarlos.
+function valuesText(v) {
+  if (typeof v === 'string') return v;
+  if (Array.isArray(v)) return v.map(valuesText).join(' ');
+  if (v && typeof v === 'object') return Object.values(v).map(valuesText).join(' ');
+  return '';
+}
+
 export function buildIndex(data) {
   const t = (h) => norm(textOf(h));
   const idx = {};
@@ -69,6 +77,8 @@ export function buildIndex(data) {
           nor: t(p.nor),
           rep: t(p.rep),
           cri: t(p.cri),
+          // checklist: todo su texto (documentos y línea de tiempo) para que la búsqueda lo encuentre
+          checklist: p.checklist ? norm(valuesText([p.checklist.documentos, p.checklist.danos, p.checklist.linea])) : '',
         };
         return { f, all: Object.values(f).join(' ') };
       }),

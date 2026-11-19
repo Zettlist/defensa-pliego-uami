@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
+import Collapsible from './Collapsible.jsx';
 
 /*
   Checklist de un punto (p.checklist en data.json). Sirve para cualquier punto que lo traiga.
-  - Pestaña "Documentos por edificio": estado editable, guardado en localStorage ("checklist:<pid>").
-  - Pestaña "Daños durante la constancia": línea de tiempo con filtros.
+  - Pestaña de documentos: estado editable, guardado en localStorage ("checklist:<pid>").
+  - Pestaña de línea de tiempo: "danos" (3.1, separa lo ocurrido durante la constancia de los antecedentes)
+    o "linea" (3.2 en adelante, con su "titulo_linea").
   Las claves de cita usan el mismo <button class="cite"> que el resto de la app (lo abre la delegación de App).
 */
 
@@ -104,6 +106,7 @@ function Documentos({ cl, pid }) {
 
   useEffect(() => { setOver(readStore(storeKey)); }, [storeKey]);
 
+  const original = (d) => base.find((b) => docKey(b) === docKey(d))?.estado;
   const docs = base.map((d) => {
     const o = over[docKey(d)];
     return { ...d, estado: estados.includes(o) ? o : d.estado, cambiado: estados.includes(o) && o !== d.estado };
@@ -113,7 +116,7 @@ function Documentos({ cl, pid }) {
 
   const setEstado = (d, v) => {
     const next = { ...over };
-    if (v === d.estadoOriginal) delete next[docKey(d)]; else next[docKey(d)] = v;
+    if (v === original(d)) delete next[docKey(d)]; else next[docKey(d)] = v;
     setOver(next);
     setSaved(writeStore(storeKey, next));
   };
@@ -126,7 +129,7 @@ function Documentos({ cl, pid }) {
       nota: 'Estados actuales del checklist. "estado_en_data_json" es el valor que trae data.json hoy.',
       documentos: docs.map((d) => ({
         edificio: d.edificio, documento: d.documento, estado: d.estado,
-        ...(d.cambiado ? { estado_en_data_json: base.find((b) => docKey(b) === docKey(d)).estado } : {}),
+        ...(d.cambiado ? { estado_en_data_json: original(d) } : {}),
       })),
     };
     try {
@@ -140,12 +143,6 @@ function Documentos({ cl, pid }) {
   };
 
   const visibles = filtro ? docs.filter((d) => d.estado === filtro) : docs;
-  const grupos = [];
-  for (const d of visibles) {
-    let g = grupos.find((x) => x.edificio === d.edificio);
-    if (!g) grupos.push(g = { edificio: d.edificio, que_es: d.que_es, docs: [] });
-    g.docs.push(d);
-  }
 
   return (
     <div className="cl-pane">
@@ -166,27 +163,30 @@ function Documentos({ cl, pid }) {
       {!saved && <p className="cl-warn">No se pudo guardar en este navegador. Los cambios se pierden al recargar; usa "Exportar estados".</p>}
       {nCambiados > 0 && saved && <p className="cl-hint">{nCambiados === 1 ? '1 estado cambiado' : `${nCambiados} estados cambiados`} en este dispositivo (no en data.json).</p>}
 
-      {!visibles.length && <p className="empty">Ningún documento con ese estado.</p>}
-      {grupos.map((g) => (
-        <section className="cl-group" key={g.edificio}>
-          <header className="cl-gh">
-            <h4>{g.edificio}</h4>
-            {g.que_es && <p>{g.que_es}</p>}
-          </header>
+      {!visibles.length ? <p className="empty">Ningún documento con ese estado.</p> : (
+        <div className="cl-wrap">
           <table className="cl-table">
             <thead>
-              <tr><th scope="col">Documento</th><th scope="col">Estado</th><th scope="col">Fuente</th><th scope="col">Dónde</th><th scope="col">Notas</th></tr>
+              <tr>
+                <th scope="col">Edificio / ámbito</th><th scope="col">Documento</th><th scope="col">Estado</th>
+                <th scope="col">Fuente</th><th scope="col">Dónde</th><th scope="col">Notas</th>
+              </tr>
             </thead>
             <tbody>
-              {g.docs.map((d) => {
-                const orig = base.find((b) => docKey(b) === docKey(d));
+              {visibles.map((d, i) => {
+                const prev = visibles[i - 1];
+                const nuevoGrupo = !prev || prev.edificio !== d.edificio;
                 return (
-                  <tr key={docKey(d)} className={d.cambiado ? 'is-changed' : ''}>
+                  <tr key={docKey(d)} className={`${d.cambiado ? 'is-changed' : ''} ${nuevoGrupo ? 'is-first' : 'is-cont'}`}>
+                    <td data-label="Edificio / ámbito" className="cl-ed">
+                      <span className="cl-ed-n">{d.edificio}</span>
+                      {d.que_es && <span className="cl-ed-q">{d.que_es}</span>}
+                    </td>
                     <td data-label="Documento" className="cl-doc">{d.documento}</td>
                     <td data-label="Estado">
                       <label className={`estado-sel pill pill-${ESTADO_TONE[d.estado] || 'mute'}`}>
                         <span className="sr-only">Estado de {d.documento}</span>
-                        <select value={d.estado} onChange={(ev) => setEstado({ ...d, estadoOriginal: orig.estado }, ev.target.value)}>
+                        <select value={d.estado} onChange={(ev) => setEstado(d, ev.target.value)}>
                           {estados.map((s) => <option key={s} value={s}>{s}</option>)}
                         </select>
                       </label>
@@ -199,34 +199,31 @@ function Documentos({ cl, pid }) {
               })}
             </tbody>
           </table>
-        </section>
-      ))}
+        </div>
+      )}
     </div>
   );
 }
 
-/* ---------- Daños ---------- */
+/* ---------- Línea de tiempo ("danos" del 3.1 o "linea" del 3.2 en adelante) ---------- */
 
-function Danos({ cl, citeIx }) {
-  const all = cl.danos || [];
+function Linea({ items, conVigencia, vigencia, citeIx }) {
   const [ed, setEd] = useState('');
   const [peso, setPeso] = useState('');
-  const v = cl.vigencia_constancia || {};
 
   const edificios = useMemo(() => {
     const c = {};
-    for (const d of all) for (const x of edificiosDe(d.edificio)) c[x] = (c[x] || 0) + 1;
+    for (const d of items) for (const x of edificiosDe(d.edificio)) c[x] = (c[x] || 0) + 1;
     // Primero las claves de edificio (T, R, AT…), luego los textos libres.
     return Object.keys(c).sort((a, b) => (b.length <= 3) - (a.length <= 3) || a.localeCompare(b, 'es'));
-  }, [all]);
+  }, [items]);
 
-  const pesos = PESOS.filter((p) => all.some((d) => d.peso === p)).concat([...new Set(all.map((d) => d.peso))].filter((p) => p && !PESOS.includes(p)));
+  const pesos = PESOS.filter((p) => items.some((d) => d.peso === p))
+    .concat([...new Set(items.map((d) => d.peso))].filter((p) => p && !PESOS.includes(p)));
   const match = (d) => (!ed || edificiosDe(d.edificio).includes(ed)) && (!peso || d.peso === peso);
   const byFecha = (a, b) => (a.fecha || '').localeCompare(b.fecha || '');
   const esAntecedente = (d) => /^no\b/i.test(d.durante_constancia || '');
-  const dentro = all.filter((d) => !esAntecedente(d) && match(d)).sort(byFecha);
-  const antes = all.filter((d) => esAntecedente(d) && match(d)).sort(byFecha);
-  const pesoN = (p) => all.filter((d) => d.peso === p && (!ed || edificiosDe(d.edificio).includes(ed))).length;
+  const pesoN = (p) => items.filter((d) => d.peso === p && (!ed || edificiosDe(d.edificio).includes(ed))).length;
 
   const Row = ({ d }) => (
     <li className={`tl-item tl-${PESO_TONE[d.peso] || 'mute'}`}>
@@ -234,7 +231,7 @@ function Danos({ cl, citeIx }) {
       <div className="tl-body">
         <div className="tl-top">
           <span className="tl-ed">{d.edificio}</span>
-          <Pill tone={PESO_TONE[d.peso]}>{d.peso}</Pill>
+          {d.peso && <Pill tone={PESO_TONE[d.peso]}>{d.peso}</Pill>}
           {d.durante_constancia && !/^(sí|si|no\b)/i.test(d.durante_constancia) && <span className="tl-tag">{d.durante_constancia}</span>}
         </div>
         <p className="tl-que">{d.que}</p>
@@ -254,6 +251,11 @@ function Danos({ cl, citeIx }) {
       </div>
     </li>
   );
+  const List = ({ list }) => (list.length ? <ol className="tl">{list.map((d, i) => <Row key={i} d={d} />)}</ol> : <p className="empty">Nada con estos filtros.</p>);
+
+  const filtrados = items.filter(match).sort(byFecha);
+  const dentro = filtrados.filter((d) => !esAntecedente(d));
+  const antes = filtrados.filter(esAntecedente);
 
   return (
     <div className="cl-pane">
@@ -269,30 +271,39 @@ function Danos({ cl, citeIx }) {
           options={[{ v: '', label: 'Todos' }, ...pesos.map((p) => ({ v: p, label: p, n: pesoN(p), tone: PESO_TONE[p] }))]} />
       </div>
 
-      <section className="tl-sec tl-in">
-        <h4 className="tl-h">Durante la constancia <span>{fmtFecha(v.desde)} – {fmtFecha(v.hasta)} · {dentro.length}</span></h4>
-        {dentro.length ? <ol className="tl">{dentro.map((d, i) => <Row key={i} d={d} />)}</ol> : <p className="empty">Nada con estos filtros.</p>}
-      </section>
-      <section className="tl-sec tl-out">
-        <h4 className="tl-h">Antecedentes <span>antes de la constancia · {antes.length}</span></h4>
-        {antes.length ? <ol className="tl">{antes.map((d, i) => <Row key={i} d={d} />)}</ol> : <p className="empty">Nada con estos filtros.</p>}
-      </section>
+      {conVigencia ? (
+        <>
+          <section className="tl-sec tl-in">
+            <h4 className="tl-h">Durante la constancia <span>{fmtFecha(vigencia?.desde)} – {fmtFecha(vigencia?.hasta)} · {dentro.length}</span></h4>
+            <List list={dentro} />
+          </section>
+          <section className="tl-sec tl-out">
+            <h4 className="tl-h">Antecedentes <span>antes de la constancia · {antes.length}</span></h4>
+            <List list={antes} />
+          </section>
+        </>
+      ) : (
+        <section className="tl-sec"><List list={filtrados} /></section>
+      )}
     </div>
   );
 }
 
-/* ---------- Contenedor ---------- */
+/* ---------- Contenedor plegable ---------- */
 
-export default function Checklist({ checklist, pid, data }) {
+export default function Checklist({ checklist, pid, data, open, onToggle, hit }) {
   const citeIx = useCiteIndex(data);
+  const esDanos = checklist.danos?.length > 0;
+  const linea = esDanos ? checklist.danos : checklist.linea || [];
   const tabs = [
     checklist.documentos?.length ? { id: 'docs', label: 'Documentos por edificio', n: checklist.documentos.length } : null,
-    checklist.danos?.length ? { id: 'danos', label: 'Daños durante la constancia', n: checklist.danos.length } : null,
+    linea.length ? { id: 'linea', label: checklist.titulo_linea || (esDanos ? 'Daños durante la constancia' : 'Línea de tiempo'), n: linea.length } : null,
   ].filter(Boolean);
   const [tab, setTab] = useState(tabs[0]?.id);
   if (!tabs.length) return null;
   const cur = tabs.some((t) => t.id === tab) ? tab : tabs[0].id;
   const idBase = `cl-${pid.replace(/[^A-Za-z0-9]/g, '-')}`;
+  const meta = tabs.map((t) => `${t.n} ${t.id === 'docs' ? 'documentos' : 'eventos'}`).join(' · ');
 
   const onKey = (ev) => {
     if (ev.key !== 'ArrowRight' && ev.key !== 'ArrowLeft') return;
@@ -304,19 +315,20 @@ export default function Checklist({ checklist, pid, data }) {
   };
 
   return (
-    <section className="checklist" aria-labelledby={`${idBase}-h`}>
-      <h2 className="block-label" id={`${idBase}-h`}>{checklist.titulo || 'Checklist'}</h2>
+    <Collapsible title={checklist.titulo || 'Checklist'} meta={meta} open={open} onToggle={onToggle} level={2} hit={hit} className="fold-checklist checklist">
       <div className="cl-tabs" role="tablist" aria-label={checklist.titulo || 'Checklist'} onKeyDown={onKey}>
         {tabs.map((t) => (
           <button key={t.id} id={`${idBase}-tab-${t.id}`} type="button" role="tab" className="cl-tab"
             aria-selected={cur === t.id} aria-controls={`${idBase}-panel`} tabIndex={cur === t.id ? 0 : -1} onClick={() => setTab(t.id)}>
-            {t.label}<span className="chip-n">{t.n}</span>
+            <span>{t.label}</span><span className="chip-n">{t.n}</span>
           </button>
         ))}
       </div>
       <div id={`${idBase}-panel`} role="tabpanel" aria-labelledby={`${idBase}-tab-${cur}`}>
-        {cur === 'docs' ? <Documentos cl={checklist} pid={pid} /> : <Danos cl={checklist} citeIx={citeIx} />}
+        {cur === 'docs'
+          ? <Documentos cl={checklist} pid={pid} />
+          : <Linea items={linea} conVigencia={esDanos} vigencia={checklist.vigencia_constancia} citeIx={citeIx} />}
       </div>
-    </section>
+    </Collapsible>
   );
 }
