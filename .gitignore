@@ -2,3 +2,6 @@ node_modules/
 dist/
 .DS_Store
 *.log
+
+# Respaldos locales de data.json (no se publican)
+public/data.backup-*.json

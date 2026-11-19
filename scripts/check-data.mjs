@@ -35,6 +35,11 @@ for (const e of d.ejes || []) {
     if (p.grupo && !Array.isArray(p.grupo)) errors.push(`${w}: "grupo" debe ser una lista de párrafos.`);
     for (const k of ['dij', 'nor', 'rep', 'cri']) if (!p[k]) warns.push(`${w}: "${k}" vacío (no se mostrará ese desplegable).`);
     if (!p.minimo) warns.push(`${w}: sin "minimo".`);
+    // checklist (opcional): cada clave de daños debe existir en "citas"
+    for (const dn of p.checklist?.danos || []) for (const k of dn.claves || []) {
+      used.add(k);
+      if (!citas[k]) errors.push(`${w}: checklist.danos usa la cita ${k}, que no está en "citas".`);
+    }
   }
   const json = JSON.stringify(e);
   for (const m of json.matchAll(/data-k=\\"([^"\\]+)\\"/g)) {

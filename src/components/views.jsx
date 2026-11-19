@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import Rich, { Hl } from './Rich.jsx';
 import Collapsible from './Collapsible.jsx';
+import Checklist from './Checklist.jsx';
 import useFolds from './useFolds.js';
 import { IconCheck, IconCollapse, IconExpand, IconLeft, IconRight } from './icons.jsx';
 import { ejeLabel, hasAll, hasAny, norm, paras, parseVerificacion, slug, verdictOf } from '../lib.js';
@@ -93,7 +94,7 @@ const SECTIONS = [
   { k: 'cri', title: 'Criterios de éxito' },
 ];
 
-export function Point({ e, ix, idx, terms, mesa, headRef }) {
+export function Point({ data, e, ix, idx, terms, mesa, headRef }) {
   const p = e.puntos[idx];
   const f = ix.puntos[idx].f;
   const secs = SECTIONS.filter((s) => p[s.k]);
@@ -166,6 +167,8 @@ export function Point({ e, ix, idx, terms, mesa, headRef }) {
           ))}
         </div>
       )}
+
+      {p.checklist && <Checklist checklist={p.checklist} pid={p.pid} data={data} />}
 
       <nav className="pager" aria-label="Puntos">
         {prev ? (
