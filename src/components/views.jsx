@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import Rich, { Hl } from './Rich.jsx';
 import Collapsible from './Collapsible.jsx';
 import Checklist from './Checklist.jsx';
+import Reportes from './Reportes.jsx';
 import useFolds from './useFolds.js';
 import { IconCheck, IconCollapse, IconExpand, IconLeft, IconRight } from './icons.jsx';
 import { ejeLabel, hasAll, hasAny, norm, paras, parseVerificacion, slug, verdictOf } from '../lib.js';
@@ -98,7 +99,7 @@ export function Point({ data, e, ix, idx, terms, mesa, headRef }) {
   const p = e.puntos[idx];
   const f = ix.puntos[idx].f;
   const secs = SECTIONS.filter((s) => p[s.k]);
-  const keys = [...(p.grupo?.length ? ['grupo'] : []), ...secs.map((s) => s.k), ...(p.checklist ? ['checklist'] : [])];
+  const keys = [...(p.grupo?.length ? ['grupo'] : []), ...secs.map((s) => s.k), ...(p.checklist ? ['checklist'] : []), ...(p.reportes ? ['reportes'] : [])];
   const matchKeys = keys.filter((k) => hasAny(f[k], terms));
   const folds = useFolds(keys, matchKeys, terms.join(' '));
   const prev = e.puntos[idx - 1];
@@ -171,6 +172,11 @@ export function Point({ data, e, ix, idx, terms, mesa, headRef }) {
       {p.checklist && (
         <Checklist checklist={p.checklist} pid={p.pid} data={data}
           open={folds.isOpen('checklist')} onToggle={() => folds.toggle('checklist')} hit={matchKeys.includes('checklist')} />
+      )}
+
+      {p.reportes && (
+        <Reportes rep={p.reportes} pid={p.pid}
+          open={folds.isOpen('reportes')} onToggle={() => folds.toggle('reportes')} hit={matchKeys.includes('reportes')} />
       )}
 
       <nav className="pager" aria-label="Puntos">

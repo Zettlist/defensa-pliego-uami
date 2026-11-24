@@ -35,6 +35,18 @@ for (const e of d.ejes || []) {
     if (p.grupo && !Array.isArray(p.grupo)) errors.push(`${w}: "grupo" debe ser una lista de párrafos.`);
     for (const k of ['dij', 'nor', 'rep', 'cri']) if (!p[k]) warns.push(`${w}: "${k}" vacío (no se mostrará ese desplegable).`);
     if (!p.minimo) warns.push(`${w}: sin "minimo".`);
+    // reportes (opcional): cada reporte con división, carrera, laboratorio y categorías conocidas
+    if (p.reportes) {
+      const r = p.reportes;
+      const cats = new Set((r.categorias || []).map((c) => c.id));
+      if (!Array.isArray(r.items) || !r.items.length) errors.push(`${w}: reportes.items debe ser una lista con reportes.`);
+      for (const it of r.items || []) {
+        for (const k of ['division', 'carrera', 'laboratorio', 'texto']) if (!it[k]) errors.push(`${w}: el reporte ${it.n} no tiene "${k}".`);
+        for (const c of it.cats || []) if (!cats.has(c)) errors.push(`${w}: el reporte ${it.n} usa la categoría "${c}", que no está en reportes.categorias.`);
+      }
+      const filas = new Set((r.items || []).map((it) => it.fila));
+      for (const h of r.hallazgos || []) for (const f of h.filas || []) if (!filas.has(f)) errors.push(`${w}: el hallazgo "${h.t}" cita la fila ${f}, que no es un reporte.`);
+    }
     // checklist (opcional): cada clave de daños debe existir en "citas"
     for (const dn of p.checklist?.danos || []) for (const k of dn.claves || []) {
       used.add(k);

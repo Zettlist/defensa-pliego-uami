@@ -79,6 +79,8 @@ export function buildIndex(data) {
           cri: t(p.cri),
           // checklist: todo su texto (documentos y línea de tiempo) para que la búsqueda lo encuentre
           checklist: p.checklist ? norm(valuesText([p.checklist.documentos, p.checklist.danos, p.checklist.linea])) : '',
+          // reportes de la comunidad (3.4): hallazgos y texto de cada reporte
+          reportes: p.reportes ? norm(valuesText([p.reportes.hallazgos, p.reportes.items])) : '',
         };
         return { f, all: Object.values(f).join(' ') };
       }),
