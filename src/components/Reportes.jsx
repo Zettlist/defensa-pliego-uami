@@ -50,7 +50,7 @@ function Hallazgos({ rep, verFilas }) {
             <p>{h.b}</p>
             {h.filas?.length > 0 && (
               <p className="rp-src">
-                <span>Fuente: {rep.fuente?.nombre}, filas {h.filas.join(', ')}</span>
+                <span>Filas {h.filas.join(', ')}</span>
                 <button type="button" className="btn btn-quiet btn-sm" onClick={() => verFilas(h.filas, h.t)}>
                   Ver {h.filas.length} reportes
                 </button>
@@ -225,9 +225,11 @@ function Lista({ items, rep, catName, sel, clearSel }) {
                           <blockquote>{r.texto.split(/\n+/).map((t, i) => <p key={i}>{t}</p>)}</blockquote>
                         </details>
                         <p className="rp-meta">
-                          <a href={filaUrl(rep.fuente?.url, r.fila)} target="_blank" rel="noopener noreferrer">Fila {r.fila} de la hoja ↗</a>
+                          {r.origen === 'formulario'
+                            ? <span>Formulario, fila {r.fila}</span>
+                            : <a href={filaUrl(rep.fuente?.url, r.fila)} target="_blank" rel="noopener noreferrer">Fila {r.fila} de la hoja ↗</a>}
                           <span>Evidencia: {r.evidencia}</span>
-                          {r.division_hoja && <span className="rp-fix">En la hoja dice {r.division_hoja}</span>}
+                          {r.division_hoja && <span className="rp-fix">En {r.origen === 'formulario' ? 'el formulario' : 'la hoja'} dice {r.division_hoja}</span>}
                         </p>
                       </li>
                     ))}
