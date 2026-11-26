@@ -34,7 +34,7 @@
             }
           ]
         },
-        { "t": "Condiciones de vocero" }
+        { "t": "Condiciones de vocero", "detalle": "Todos sus compañeros de eje tienen que respaldar al compañero." }
       ]
     },
     {
