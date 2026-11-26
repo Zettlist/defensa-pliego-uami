@@ -79,10 +79,11 @@ try {
   for (const [i, pt] of (rg.partes || []).entries()) {
     const w = `reglamento.json, parte ${i + 1}`;
     if (!pt.titulo) errors.push(`${w}: falta "titulo".`);
-    if (pt.color && !['azul', 'verde', 'ambar'].includes(pt.color)) errors.push(`${w}: "color" debe ser azul, verde o ambar.`);
+    if (pt.color && !['azul', 'verde', 'ambar', 'gris'].includes(pt.color)) errors.push(`${w}: "color" debe ser azul, verde, ambar o gris.`);
     for (const k of ['tareas', 'recomendaciones']) {
       if (pt[k] != null && !Array.isArray(pt[k])) errors.push(`${w}: "${k}" debe ser una lista.`);
       for (const x of pt[k] || []) if (!x || !x.t) errors.push(`${w}: hay un elemento de "${k}" sin texto ("t").`);
+      for (const x of pt[k] || []) for (const r of x?.roles || []) if (!r.nombre) errors.push(`${w}: "${x.t}" tiene un rol sin "nombre".`);
     }
   }
 } catch (err) {

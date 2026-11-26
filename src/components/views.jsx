@@ -5,7 +5,7 @@ import Checklist from './Checklist.jsx';
 import Reportes from './Reportes.jsx';
 import useFolds from './useFolds.js';
 import { IconCheck, IconCollapse, IconExpand, IconLeft, IconRight } from './icons.jsx';
-import { ejeLabel, hasAll, hasAny, norm, paras, parseVerificacion, reglamentoItems, slug, verdictOf } from '../lib.js';
+import { ejeLabel, hasAll, hasAny, norm, paras, parseVerificacion, reglamentoItems, reglamentoText, slug, verdictOf } from '../lib.js';
 
 const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
 
@@ -378,9 +378,10 @@ export function Advertencias({ e, ix, terms, headRef }) {
 
 /* ---------------- Reglamento de las mesas (reglamento.json, común a todos los ejes) ---------------- */
 
-const REG_TONE = { azul: 'blue', verde: 'green', ambar: 'amber' };
+const REG_TONE = { azul: 'blue', verde: 'green', ambar: 'amber', gris: 'gray' };
 
 function RegItem({ x, terms }) {
+  const searching = terms.length > 0;
   return (
     <li className="reg-item">
       <span className="reg-t">
@@ -390,6 +391,20 @@ function RegItem({ x, terms }) {
       {x.responsable && (
         <span className="reg-resp" title="Responsable"><span className="sr-only">Responsable: </span><Hl text={x.responsable} terms={terms} /></span>
       )}
+      {x.roles?.length > 0 && (
+        <div className="reg-roles">
+          {x.roles.map((r, k) => {
+            const hit = searching && hasAll(norm([r.nombre, r.descripcion, r.ejemplo].join(' ')), terms);
+            return (
+              <details key={`${k}-${hit}`} className="reg-rol" open={hit || undefined}>
+                <summary><Hl text={r.nombre} terms={terms} /></summary>
+                {r.descripcion && <Hl as="p" text={r.descripcion} terms={terms} />}
+                {r.ejemplo && <blockquote><span className="reg-ej">Ejemplo</span><Hl as="p" text={`«${r.ejemplo}»`} terms={terms} /></blockquote>}
+              </details>
+            );
+          })}
+        </div>
+      )}
     </li>
   );
 }
@@ -398,7 +413,7 @@ export function Reglamento({ data, e, terms, headRef }) {
   const reg = data.reglamento;
   const searching = terms.length > 0;
   // Misma normalización que el índice de búsqueda (lib.js): parte + tarea + detalle + responsable.
-  const matches = (x, parte) => !searching || hasAll(norm([parte, x.t, x.detalle, x.responsable].filter(Boolean).join(' ')), terms);
+  const matches = (x, parte) => !searching || hasAll(norm(reglamentoText({ ...x, parte })), terms);
   const nHits = searching ? reglamentoItems(reg).filter((x) => matches(x, x.parte)).length : 1;
 
   return (
@@ -411,13 +426,15 @@ export function Reglamento({ data, e, terms, headRef }) {
           {searching && !nHits && <p className="empty">Sin coincidencias en el reglamento.</p>}
           <div className="reg-grid">
             {reg.partes.map((p, i) => {
+              // Las partes numeradas no llevan "etiqueta"; un bloque con etiqueta (p. ej. Recomendaciones) no cuenta.
+              const num = reg.partes.slice(0, i + 1).filter((q) => !q.etiqueta).length;
               const tareas = (p.tareas || []).filter((x) => matches(x, p.titulo));
               const recs = (p.recomendaciones || []).filter((x) => matches(x, p.titulo));
               if (searching && !tareas.length && !recs.length) return null;
               return (
                 <section key={p.id || i} className={`reg-parte reg-${REG_TONE[p.color] || 'blue'}`} style={{ '--i': i }} aria-labelledby={`reg-${p.id || i}`}>
                   <header className="reg-h">
-                    <span className="reg-n">Parte {i + 1}</span>
+                    <span className="reg-n">{p.etiqueta || `Parte ${num}`}</span>
                     <h2 id={`reg-${p.id || i}`}>{p.titulo}</h2>
                   </header>
                   {tareas.length > 0 && <ul className="reg-list">{tareas.map((x, j) => <RegItem key={j} x={x} terms={terms} />)}</ul>}

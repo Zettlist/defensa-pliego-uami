@@ -7,9 +7,33 @@
       "titulo": "Dentro de las mesas",
       "color": "azul",
       "tareas": [
-        { "t": "Objetivos del eje" },
-        { "t": "Códigos de conducta" },
-        { "t": "Roles de mesa" },
+        { "t": "Objetivos del eje", "detalle": "Todos los ejes tienen que compartir sus puntos de éxito o los objetivos a solicitar a las autoridades." },
+        { "t": "Códigos de conducta", "responsable": "Ric" },
+        {
+          "t": "Roles de mesa",
+          "roles": [
+            {
+              "nombre": "Combativo",
+              "descripcion": "Es quien presiona. Defiende las demandas con firmeza, señala incumplimientos, contradicciones o evasivas de la contraparte y no deja pasar respuestas vagas. Marca el costo de no llegar a un acuerdo. Su valor es que pone en evidencia lo que la otra parte quiere evitar. El riesgo es que, si se pasa de tono, la contraparte se cierre o use su actitud para descalificar al equipo. Por eso conviene que se apoye en datos concretos (fechas, documentos, casos) y no en ataques personales.",
+              "ejemplo": "La reparación de esa luminaria se reportó hace tres meses y sigue sin atenderse. ¿Quién es el responsable y cuál es la fecha comprometida?"
+            },
+            {
+              "nombre": "Facilitador",
+              "descripcion": "Cuida el proceso más que el contenido. Lleva el orden del día, administra los tiempos y los turnos de palabra, resume lo que se ha dicho y regresa la conversación al punto cuando se desvía. Cuando hay tensión, baja la temperatura sin ceder en el fondo. Es el que propone un receso o dice \"anotemos esto y pasemos al siguiente punto\".",
+              "ejemplo": "Para avanzar: en este punto coincidimos en el diagnóstico y lo que falta es el plazo. ¿Lo dejamos para cerrarlo al final?"
+            },
+            {
+              "nombre": "Negociador",
+              "descripcion": "Es la voz principal que hace y recibe propuestas. Conoce a fondo qué es innegociable, qué se puede ceder y a cambio de qué. Pide compromisos concretos (quién, qué, cuándo, cómo se verifica) y no acepta promesas genéricas. Es quien dice \"sí\", \"no\" o \"lo consultamos\" en nombre del equipo, así que debe tener claro el mandato que le dieron.",
+              "ejemplo": "Aceptamos el calendario por etapas si la primera fase arranca antes de fin de mes y se nos entrega un informe de avance cada quince días."
+            },
+            {
+              "nombre": "Integrador",
+              "descripcion": "Busca puntos en común y construye soluciones donde las dos partes ganen algo. Reformula las demandas en términos de intereses compartidos (por ejemplo, la seguridad de toda la comunidad, no solo la de un sector) y propone alternativas creativas cuando la mesa se atora. También suele encargarse de que los acuerdos queden redactados de forma clara y completa.",
+              "ejemplo": "Los dos queremos que el campus sea seguro de noche. ¿Qué tal si se forma una comisión mixta que revise los puntos críticos y se publique el avance?"
+            }
+          ]
+        },
         { "t": "Condiciones de vocero" }
       ]
     },
@@ -18,9 +42,9 @@
       "titulo": "Fuera de las mesas",
       "color": "verde",
       "tareas": [
-        { "t": "Seleccionar personas una noche antes de las mesas de negociación", "detalle": "Por eje" },
+        { "t": "Selección de personal de mesas de deliberación", "detalle": "Una noche antes de las mesas de negociación, por eje." },
         { "t": "Códigos de conducta", "responsable": "Pyro" },
-        { "t": "Filtro de voceros", "responsable": "Faby" }
+        { "t": "Actividades de vocero", "responsable": "Faby" }
       ]
     },
     {
@@ -29,8 +53,14 @@
       "color": "ambar",
       "tareas": [
         { "t": "Asesores como filtro", "responsable": "Diego (Biología)" }
-      ],
-      "recomendaciones": [
+      ]
+    },
+    {
+      "id": "recomendaciones",
+      "titulo": "Recomendaciones",
+      "etiqueta": "Para las mesas",
+      "color": "gris",
+      "tareas": [
         { "t": "Transmisión en vivo", "detalle": "Trae el tripié", "responsable": "Alondra" },
         { "t": "Relevos" },
         { "t": "Poner más audio" },

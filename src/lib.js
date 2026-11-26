@@ -73,6 +73,12 @@ export function reglamentoItems(reg) {
   return out;
 }
 
+/** Texto buscable de una tarea del reglamento: parte, tarea, detalle, responsable y roles. */
+export function reglamentoText(x) {
+  const roles = (x.roles || []).map((r) => [r.nombre, r.descripcion, r.ejemplo].join(' '));
+  return [x.parte, x.t, x.detalle, x.responsable, ...roles].filter(Boolean).join(' ');
+}
+
 export function buildIndex(data) {
   const t = (h) => norm(textOf(h));
   const idx = {};
@@ -105,7 +111,7 @@ export function buildIndex(data) {
       })),
       adv: e.advertencias.map(t),
       // reglamento de las mesas: común a todos los ejes; una entrada por tarea o recomendación
-      regl: reglamentoItems(data.reglamento).map((x) => norm([x.parte, x.t, x.detalle, x.responsable].filter(Boolean).join(' '))),
+      regl: reglamentoItems(data.reglamento).map((x) => norm(reglamentoText(x))),
       intro: t(e.intro),
     };
   }
