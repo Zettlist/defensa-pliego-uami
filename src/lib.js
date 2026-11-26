@@ -28,6 +28,7 @@ export const VIEWS = [
   { id: 'verificacion', label: 'Verificación de citas' },
   { id: 'glosario', label: 'Glosario' },
   { id: 'advertencias', label: 'Advertencias' },
+  { id: 'reglamento', label: 'Reglamento de las mesas' },
 ];
 
 /** Lee el hash (#eje1-p1-4). Solo letras, dígitos y guiones. */
@@ -62,6 +63,16 @@ function valuesText(v) {
   return '';
 }
 
+/** Tareas y recomendaciones del reglamento, en orden, con el título de su parte. */
+export function reglamentoItems(reg) {
+  const out = [];
+  for (const p of reg?.partes || []) {
+    for (const x of p.tareas || []) out.push({ ...x, parte: p.titulo, tipo: 'tarea' });
+    for (const x of p.recomendaciones || []) out.push({ ...x, parte: p.titulo, tipo: 'recomendacion' });
+  }
+  return out;
+}
+
 export function buildIndex(data) {
   const t = (h) => norm(textOf(h));
   const idx = {};
@@ -93,6 +104,8 @@ export function buildIndex(data) {
         items: g.items.map((i) => t(i.t) + ' ' + t(i.d)),
       })),
       adv: e.advertencias.map(t),
+      // reglamento de las mesas: común a todos los ejes; una entrada por tarea o recomendación
+      regl: reglamentoItems(data.reglamento).map((x) => norm([x.parte, x.t, x.detalle, x.responsable].filter(Boolean).join(' '))),
       intro: t(e.intro),
     };
   }
@@ -109,7 +122,8 @@ export function countMatches(ix, terms) {
     0
   );
   const adv = ix.adv.filter((a) => hasAll(a, terms)).length;
-  return { puntos, deb, glos, adv, total: puntos + deb + glos + adv };
+  const regl = (ix.regl || []).filter((r) => hasAll(r, terms)).length;
+  return { puntos, deb, glos, adv, regl, total: puntos + deb + glos + adv + regl };
 }
 
 /**

@@ -72,6 +72,23 @@ try {
   if (err.code !== 'ENOENT') errors.push('estado.json no es JSON válido: ' + err.message);
 }
 
+// reglamento.json (opcional): partes con título, color conocido y tareas con texto.
+try {
+  const rg = JSON.parse(readFileSync(new URL('../public/reglamento.json', import.meta.url), 'utf8'));
+  if (!Array.isArray(rg.partes) || !rg.partes.length) errors.push('reglamento.json: "partes" debe ser una lista.');
+  for (const [i, pt] of (rg.partes || []).entries()) {
+    const w = `reglamento.json, parte ${i + 1}`;
+    if (!pt.titulo) errors.push(`${w}: falta "titulo".`);
+    if (pt.color && !['azul', 'verde', 'ambar'].includes(pt.color)) errors.push(`${w}: "color" debe ser azul, verde o ambar.`);
+    for (const k of ['tareas', 'recomendaciones']) {
+      if (pt[k] != null && !Array.isArray(pt[k])) errors.push(`${w}: "${k}" debe ser una lista.`);
+      for (const x of pt[k] || []) if (!x || !x.t) errors.push(`${w}: hay un elemento de "${k}" sin texto ("t").`);
+    }
+  }
+} catch (err) {
+  if (err.code !== 'ENOENT') errors.push('reglamento.json no es JSON válido: ' + err.message);
+}
+
 const unused = Object.keys(citas).filter((k) => !used.has(k));
 if (unused.length) warns.push(`${unused.length} citas definidas no se usan en ningún botón (no es un problema).`);
 

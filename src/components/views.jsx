@@ -5,7 +5,7 @@ import Checklist from './Checklist.jsx';
 import Reportes from './Reportes.jsx';
 import useFolds from './useFolds.js';
 import { IconCheck, IconCollapse, IconExpand, IconLeft, IconRight } from './icons.jsx';
-import { ejeLabel, hasAll, hasAny, norm, paras, parseVerificacion, slug, verdictOf } from '../lib.js';
+import { ejeLabel, hasAll, hasAny, norm, paras, parseVerificacion, reglamentoItems, slug, verdictOf } from '../lib.js';
 
 const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
 
@@ -372,6 +372,67 @@ export function Advertencias({ e, ix, terms, headRef }) {
           </li>
         ))}
       </ol>
+    </div>
+  );
+}
+
+/* ---------------- Reglamento de las mesas (reglamento.json, común a todos los ejes) ---------------- */
+
+const REG_TONE = { azul: 'blue', verde: 'green', ambar: 'amber' };
+
+function RegItem({ x, terms }) {
+  return (
+    <li className="reg-item">
+      <span className="reg-t">
+        <Hl text={x.t} terms={terms} />
+        {x.detalle && <Hl className="reg-det" text={x.detalle} terms={terms} />}
+      </span>
+      {x.responsable && (
+        <span className="reg-resp" title="Responsable"><span className="sr-only">Responsable: </span><Hl text={x.responsable} terms={terms} /></span>
+      )}
+    </li>
+  );
+}
+
+export function Reglamento({ data, e, terms, headRef }) {
+  const reg = data.reglamento;
+  const searching = terms.length > 0;
+  // Misma normalización que el índice de búsqueda (lib.js): parte + tarea + detalle + responsable.
+  const matches = (x, parte) => !searching || hasAll(norm([parte, x.t, x.detalle, x.responsable].filter(Boolean).join(' ')), terms);
+  const nHits = searching ? reglamentoItems(reg).filter((x) => matches(x, x.parte)).length : 1;
+
+  return (
+    <div className="view">
+      <ViewHead e={e} eyebrow="Todas las mesas · aplica a todos los ejes" title={reg?.titulo || 'Reglamento de las mesas'} headRef={headRef}>
+        {reg?.fuente && <p className="lead">{reg.fuente}</p>}
+      </ViewHead>
+      {!reg ? <p className="empty">No hay reglamento cargado (falta reglamento.json).</p> : (
+        <>
+          {searching && !nHits && <p className="empty">Sin coincidencias en el reglamento.</p>}
+          <div className="reg-grid">
+            {reg.partes.map((p, i) => {
+              const tareas = (p.tareas || []).filter((x) => matches(x, p.titulo));
+              const recs = (p.recomendaciones || []).filter((x) => matches(x, p.titulo));
+              if (searching && !tareas.length && !recs.length) return null;
+              return (
+                <section key={p.id || i} className={`reg-parte reg-${REG_TONE[p.color] || 'blue'}`} style={{ '--i': i }} aria-labelledby={`reg-${p.id || i}`}>
+                  <header className="reg-h">
+                    <span className="reg-n">Parte {i + 1}</span>
+                    <h2 id={`reg-${p.id || i}`}>{p.titulo}</h2>
+                  </header>
+                  {tareas.length > 0 && <ul className="reg-list">{tareas.map((x, j) => <RegItem key={j} x={x} terms={terms} />)}</ul>}
+                  {recs.length > 0 && (
+                    <div className="reg-recs">
+                      <h3>Recomendaciones</h3>
+                      <ul className="reg-list">{recs.map((x, j) => <RegItem key={j} x={x} terms={terms} />)}</ul>
+                    </div>
+                  )}
+                </section>
+              );
+            })}
+          </div>
+        </>
+      )}
     </div>
   );
 }

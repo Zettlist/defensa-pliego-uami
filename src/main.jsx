@@ -19,11 +19,16 @@ root.render(<Status>Cargando la defensa…</Status>);
 const estado = fetch('./estado.json', { cache: 'no-cache' })
   .then((r) => (r.ok ? r.json() : {}))
   .catch(() => ({}));
+// reglamento.json (opcional): reglamento de las mesas, común a todos los ejes; también aparte de data.json.
+const reglamento = fetch('./reglamento.json', { cache: 'no-cache' })
+  .then((r) => (r.ok ? r.json() : null))
+  .catch(() => null);
 
 fetch('./data.json', { cache: 'no-cache' })
   .then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-  .then((data) => estado.then((st) => {
+  .then((data) => Promise.all([estado, reglamento]).then(([st, reg]) => {
     for (const e of data?.ejes || []) e.cumplidos = new Set(st?.cumplidos?.[e.id] || []);
+    if (data && Array.isArray(reg?.partes)) data.reglamento = reg;
     return data;
   }))
   .then((data) => {

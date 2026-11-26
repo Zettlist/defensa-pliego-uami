@@ -1,6 +1,6 @@
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { Sidebar, MobileNav } from './components/Nav.jsx';
-import { Overview, Point, Debilidades, Verificacion, Glosario, Advertencias } from './components/views.jsx';
+import { Overview, Point, Debilidades, Verificacion, Glosario, Advertencias, Reglamento } from './components/views.jsx';
 import CitePanel from './components/CitePanel.jsx';
 import { ScrollProgress } from './components/fx.jsx';
 import { IconClose, IconSearch } from './components/icons.jsx';
@@ -95,6 +95,7 @@ export default function App({ data }) {
   else if (route.view === 'verificacion') main = <Verificacion key={e.id + route.view} {...common} />;
   else if (route.view === 'glosario') main = <Glosario key={e.id + route.view} {...common} />;
   else if (route.view === 'advertencias') main = <Advertencias key={e.id + route.view} {...common} />;
+  else if (route.view === 'reglamento') main = <Reglamento key={e.id + route.view} {...common} />;
   else main = <Overview key={e.id + 'inicio'} {...common} />;
 
   const searching = terms.length > 0;

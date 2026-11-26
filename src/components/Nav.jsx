@@ -3,8 +3,8 @@ import { VIEWS, ejeLabel, hasAll, slug } from '../lib.js';
 export function Sidebar({ e, ix, view, terms, counts, other, otherCounts }) {
   const searching = terms.length > 0;
   const pts = e.puntos.map((p, i) => ({ p, hit: hasAll(ix.puntos[i].all, terms) }));
-  const viewCount = { debilidades: counts?.deb, glosario: counts?.glos, advertencias: counts?.adv };
-  const total = { debilidades: e.debilidades.length, advertencias: e.advertencias.length };
+  const viewCount = { debilidades: counts?.deb, glosario: counts?.glos, advertencias: counts?.adv, reglamento: counts?.regl };
+  const total = { debilidades: e.debilidades.length, advertencias: e.advertencias.length, reglamento: ix.regl?.length || undefined };
 
   return (
     <nav className="side" aria-label={`Índice del ${ejeLabel(e)}`}>

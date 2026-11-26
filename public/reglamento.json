@@ -1,0 +1,42 @@
+{
+  "titulo": "Reglamento de las mesas de negociación",
+  "fuente": "Notas de la reunión del 25 de noviembre de 2026",
+  "partes": [
+    {
+      "id": "dentro",
+      "titulo": "Dentro de las mesas",
+      "color": "azul",
+      "tareas": [
+        { "t": "Objetivos del eje" },
+        { "t": "Códigos de conducta" },
+        { "t": "Roles de mesa" },
+        { "t": "Condiciones de vocero" }
+      ]
+    },
+    {
+      "id": "fuera",
+      "titulo": "Fuera de las mesas",
+      "color": "verde",
+      "tareas": [
+        { "t": "Seleccionar personas una noche antes de las mesas de negociación", "detalle": "Por eje" },
+        { "t": "Códigos de conducta", "responsable": "Pyro" },
+        { "t": "Filtro de voceros", "responsable": "Faby" }
+      ]
+    },
+    {
+      "id": "durante",
+      "titulo": "Durante las mesas",
+      "color": "ambar",
+      "tareas": [
+        { "t": "Asesores como filtro", "responsable": "Diego (Biología)" }
+      ],
+      "recomendaciones": [
+        { "t": "Transmisión en vivo", "detalle": "Trae el tripié", "responsable": "Alondra" },
+        { "t": "Relevos" },
+        { "t": "Poner más audio" },
+        { "t": "Internet por cable" },
+        { "t": "Pruebas de audio antes" }
+      ]
+    }
+  ]
+}
