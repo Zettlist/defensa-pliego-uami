@@ -36,6 +36,104 @@ function NoResults({ what }) {
   return <p className="empty">Sin coincidencias en {what} de este eje.</p>;
 }
 
+/* ---------------- Cronograma (cronograma.json, arriba del resumen) ---------------- */
+
+function CroResp({ who, terms }) {
+  return <span className="reg-resp" title="Responsable"><span className="sr-only">Responsable: </span><Hl text={who} terms={terms} /></span>;
+}
+
+function Cronograma({ c, terms }) {
+  return (
+    <section className="cro" aria-labelledby="cro-h">
+      <header className="cro-h">
+        <div>
+          <h2 id="cro-h" className="sec-title">{c.titulo || 'Cronograma'}</h2>
+          {c.fuente && <p className="sec-sub">{c.fuente}</p>}
+        </div>
+        {c.roles?.length > 0 && (
+          <dl className="cro-roles">
+            {c.roles.map((r, i) => (
+              <div key={i}><dt>{r.rol}</dt><dd><Hl text={r.quien} terms={terms} /></dd></div>
+            ))}
+          </dl>
+        )}
+      </header>
+
+      {c.aviso && <p className="cro-aviso"><Hl text={c.aviso} terms={terms} /></p>}
+
+      {c.pasos?.length > 0 && (
+        <ol className="cro-pasos">
+          {c.pasos.map((p, i) => (
+            <li key={i} className="cro-paso">
+              <span className="cro-n" aria-hidden="true">{i + 1}</span>
+              <div className="cro-body">
+                <p className="cro-t">
+                  <Hl text={p.t} terms={terms} />
+                  {p.etiqueta && <span className="cro-tag"><Hl text={p.etiqueta} terms={terms} /></span>}
+                </p>
+                {p.detalle && <Hl as="p" className="cro-det" text={p.detalle} terms={terms} />}
+                {p.listas?.length > 0 && (
+                  <div className="cro-listas">
+                    {p.listas.map((l, j) => (
+                      <div key={j} className="cro-lista">
+                        <h3>{l.titulo}</h3>
+                        <ol type="a">{l.items.map((x, k) => <li key={k}><Hl text={x} terms={terms} /></li>)}</ol>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {p.firmantes?.length > 0 && (
+                  <div className="cro-firm">
+                    <h3>Deben garantizarlo con su firma</h3>
+                    <ul>{p.firmantes.map((x, k) => <li key={k}><Hl text={x} terms={terms} /></li>)}</ul>
+                  </div>
+                )}
+              </div>
+            </li>
+          ))}
+        </ol>
+      )}
+
+      <div className="cro-grid">
+        {c.estrategia?.length > 0 && (
+          <div className="cro-box reg-blue">
+            <h3>Estrategia en la mesa</h3>
+            <ul className="reg-list">
+              {c.estrategia.map((x, i) => (
+                <li key={i} className="reg-item">
+                  <span className="reg-t"><Hl text={x.t} terms={terms} />{x.detalle && <Hl className="reg-det" text={x.detalle} terms={terms} />}</span>
+                  {x.responsable && <CroResp who={x.responsable} terms={terms} />}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {c.contrarespuesta?.length > 0 && (
+          <div className="cro-box reg-amber">
+            <h3>Contrarespuesta esperada</h3>
+            <ul className="reg-list">
+              {c.contrarespuesta.map((x, i) => <li key={i} className="reg-item"><span className="reg-t"><Hl text={x} terms={terms} /></span></li>)}
+            </ul>
+          </div>
+        )}
+        {c.otros?.length > 0 && (
+          <div className="cro-box reg-gray">
+            <h3>Otros temas del eje</h3>
+            <ul className="reg-list">
+              {c.otros.map((x, i) => (
+                <li key={i} className="reg-item">
+                  <span className="reg-t"><Hl text={x.t} terms={terms} />{x.detalle && <Hl className="reg-det" text={x.detalle} terms={terms} />}</span>
+                  {x.responsable && <CroResp who={x.responsable} terms={terms} />}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 /* ---------------- Resumen para la mesa ---------------- */
 
 export function Overview({ data, e, ix, terms, headRef }) {
@@ -46,6 +144,8 @@ export function Overview({ data, e, ix, terms, headRef }) {
   return (
     <div className="view">
       <ViewHead className="hero" e={e} eyebrow={`Mesa de diálogo · ${data.mesa}`} title={e.full || e.title} headRef={headRef} />
+
+      {e.cronograma && <Cronograma c={e.cronograma} terms={terms} />}
 
       <section aria-labelledby="ov-h">
         <div className="sec-head">

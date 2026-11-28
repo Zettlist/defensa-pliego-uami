@@ -1,0 +1,61 @@
+{
+  "nota": "Cronograma de cada eje, arriba del Resumen para la mesa. Se mantiene aparte de data.json para que no se pierda al publicar un data.json nuevo.",
+  "eje1": {
+    "titulo": "Cronograma",
+    "fuente": "Notas del pizarrón del equipo",
+    "aviso": "No es acuerdo: es compromiso para llegar a un acuerdo.",
+    "roles": [
+      { "rol": "Negociador", "quien": "Ric" },
+      { "rol": "Combativo", "quien": "Richi" }
+    ],
+    "pasos": [
+      { "t": "Demanda sin atender" },
+      { "t": "Tiempo de resolución", "detalle": "Sin fecha: el tiempo en que se tardaría en atender cada demanda." },
+      { "t": "Responsable de revisión de demandas" },
+      {
+        "t": "Firmas vinculantes para garantizar el servicio de biblioteca",
+        "detalle": "El servicio de biblioteca consta de:",
+        "etiqueta": "No negociable: es exigencia",
+        "listas": [
+          {
+            "titulo": "Acervo de biblioteca",
+            "items": [
+              "Colección general",
+              "Colección de reserva",
+              "Colección de consulta",
+              "Colección de consulta especializada",
+              "Colección hemeroteca",
+              "Colecciones especializadas"
+            ]
+          },
+          {
+            "titulo": "Servicios",
+            "items": [
+              "Préstamo en sala",
+              "Préstamo a domicilio",
+              "Préstamo interbibliotecario",
+              "Cubículos de estudio",
+              "Servicio de fotocopiado"
+            ]
+          }
+        ],
+        "firmantes": [
+          "Rectora Dra. Edith Ponce",
+          "Dra. M. C. Fajardo",
+          "Representante del SITUAM"
+        ]
+      }
+    ],
+    "estrategia": [
+      { "t": "Presionar a las autoridades para que acepten", "responsable": "Richi" },
+      { "t": "Concretar con redacción los puntos de negociación", "responsable": "Ric" }
+    ],
+    "contrarespuesta": [
+      "No hay presupuesto hasta febrero."
+    ],
+    "otros": [
+      { "t": "Solicitar nueva constancia", "responsable": "Ric" },
+      { "t": "Incumplimiento de envío correcto de documentos", "detalle": "Propuestas de Ric", "responsable": "Ric" }
+    ]
+  }
+}

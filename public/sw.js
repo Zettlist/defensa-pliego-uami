@@ -1,5 +1,5 @@
 // Service worker mínimo para que la herramienta siga abriendo sin conexión en la mesa.
-// - index.html y data.json: primero la red (así siempre se ve la versión publicada más reciente);
+// - index.html y los JSON (data, estado, reglamento, cronograma): primero la red (así siempre se ve la versión publicada más reciente);
 //   si no hay red, la última copia guardada.
 // - Archivos con hash en /assets/: primero la caché (nunca cambian).
 const CACHE = 'defensa-pliego-v2';
@@ -27,7 +27,7 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
 
-  const networkFirst = req.mode === 'navigate' || url.pathname.endsWith('/data.json') || url.pathname.endsWith('/estado.json') || url.pathname.endsWith('/reglamento.json') || url.pathname.endsWith('.html');
+  const networkFirst = req.mode === 'navigate' || url.pathname.endsWith('/data.json') || url.pathname.endsWith('/estado.json') || url.pathname.endsWith('/reglamento.json') || url.pathname.endsWith('/cronograma.json') || url.pathname.endsWith('.html');
   if (networkFirst) {
     // Clave sin query ni hash; 'no-cache' revalida con el servidor (nunca una copia vieja del navegador).
     const key = url.origin + url.pathname;

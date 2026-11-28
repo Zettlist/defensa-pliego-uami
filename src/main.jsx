@@ -23,11 +23,18 @@ const estado = fetch('./estado.json', { cache: 'no-cache' })
 const reglamento = fetch('./reglamento.json', { cache: 'no-cache' })
   .then((r) => (r.ok ? r.json() : null))
   .catch(() => null);
+// cronograma.json (opcional): cronograma de cada eje ({ "eje1": {...} }), arriba del resumen; también aparte.
+const cronograma = fetch('./cronograma.json', { cache: 'no-cache' })
+  .then((r) => (r.ok ? r.json() : null))
+  .catch(() => null);
 
 fetch('./data.json', { cache: 'no-cache' })
   .then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-  .then((data) => Promise.all([estado, reglamento]).then(([st, reg]) => {
-    for (const e of data?.ejes || []) e.cumplidos = new Set(st?.cumplidos?.[e.id] || []);
+  .then((data) => Promise.all([estado, reglamento, cronograma]).then(([st, reg, cro]) => {
+    for (const e of data?.ejes || []) {
+      e.cumplidos = new Set(st?.cumplidos?.[e.id] || []);
+      if (cro?.[e.id]) e.cronograma = cro[e.id];
+    }
     if (data && Array.isArray(reg?.partes)) data.reglamento = reg;
     return data;
   }))

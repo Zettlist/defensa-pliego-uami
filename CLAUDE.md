@@ -70,9 +70,10 @@ npm run preview   # sirve dist/ en http://localhost:4173
 | `public/data.json` | Todo el contenido de los ejes: puntos, citas, debilidades, verificación, glosario, advertencias, checklists y reportes | Lo genera el chat de claude.ai; aquí solo se publica (o se fusiona por script cuando el usuario lo pide) |
 | `public/estado.json` | Puntos ya cumplidos: `{"cumplidos": {"eje1": ["1.1.a", ...]}}` | Se edita aquí ("marca el 1.2 como cumplido") |
 | `public/reglamento.json` | Reglamento de las mesas: `partes[]` con `color` (azul, verde, ambar, gris), `etiqueta` opcional, `tareas[]` con `t`, `detalle`, `responsable` y `roles[]` (`nombre`, `descripcion`, `ejemplo`) | Se edita aquí |
+| `public/cronograma.json` | Cronograma de cada eje, arriba del Resumen para la mesa: `{"eje1": {titulo, fuente, aviso, roles[], pasos[] (t, detalle, etiqueta, listas[], firmantes[]), estrategia[], contrarespuesta[], otros[]}}` | Se edita aquí |
 
-`estado.json` y `reglamento.json` van **aparte** a propósito: así un `data.json` nuevo del chat no los
-borra. `main.jsx` carga los tres y los junta (`e.cumplidos`, `data.reglamento`).
+`estado.json`, `reglamento.json` y `cronograma.json` van **aparte** a propósito: así un `data.json` nuevo del chat no los
+borra. `main.jsx` los carga y los junta (`e.cumplidos`, `data.reglamento`, `e.cronograma`).
 
 ### Estructura de data.json (resumen)
 ```

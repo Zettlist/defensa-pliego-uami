@@ -90,6 +90,22 @@ try {
   if (err.code !== 'ENOENT') errors.push('reglamento.json no es JSON válido: ' + err.message);
 }
 
+// cronograma.json (opcional): { "<eje>": { titulo, pasos[], ... } } con ejes que existan en data.json.
+try {
+  const cr = JSON.parse(readFileSync(new URL('../public/cronograma.json', import.meta.url), 'utf8'));
+  const ids = new Set((d.ejes || []).map((e) => e.id));
+  for (const [k, c] of Object.entries(cr)) {
+    if (k === 'nota') continue;
+    const w = `cronograma.json, ${k}`;
+    if (!ids.has(k)) errors.push(`${w}: no existe ese eje en data.json.`);
+    for (const f of ['roles', 'pasos', 'estrategia', 'contrarespuesta', 'otros']) if (c[f] != null && !Array.isArray(c[f])) errors.push(`${w}: "${f}" debe ser una lista.`);
+    for (const f of ['pasos', 'estrategia', 'otros']) for (const x of c[f] || []) if (!x || !x.t) errors.push(`${w}: hay un elemento de "${f}" sin texto ("t").`);
+    for (const p of c.pasos || []) for (const l of p?.listas || []) if (!l.titulo || !Array.isArray(l.items)) errors.push(`${w}: "${p.t}" tiene una lista sin "titulo" o sin "items".`);
+  }
+} catch (err) {
+  if (err.code !== 'ENOENT') errors.push('cronograma.json no es JSON válido: ' + err.message);
+}
+
 const unused = Object.keys(citas).filter((k) => !used.has(k));
 if (unused.length) warns.push(`${unused.length} citas definidas no se usan en ningún botón (no es un problema).`);
 

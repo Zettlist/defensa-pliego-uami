@@ -833,3 +833,52 @@ html.mesa .mesa-block .prose { font-size: 1.06rem; }
 @media (max-width: 760px) { .reg-roles { margin-left: 0; } }
 @media print { .reg-parte { break-inside: avoid; animation: none; } }
 @media print { .reg-rol > p, .reg-rol blockquote { display: block; } }
+
+/* ---------- Cronograma (arriba del resumen del eje) ---------- */
+.cro {
+  margin: 0 0 32px; padding: 18px 20px 20px;
+  background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--accent);
+  border-radius: var(--r); box-shadow: var(--shadow);
+}
+.cro-h { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 10px 20px; }
+.cro-roles { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+.cro-roles > div { padding: 6px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-2); }
+.cro-roles dt { font: 650 .66rem/1.3 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.cro-roles dd { margin: 0; font-weight: 650; color: var(--ink); }
+.cro-aviso {
+  margin: 14px 0 0; padding: 10px 14px; border-left: 3px solid var(--warn); border-radius: 0 8px 8px 0;
+  background: var(--warn-soft); font: 600 .95rem/1.45 var(--sans); color: var(--ink);
+}
+.cro-pasos { list-style: none; margin: 16px 0 0; padding: 0; }
+.cro-paso { position: relative; display: flex; gap: 14px; padding: 0 0 14px; }
+.cro-paso:not(:last-child)::before {
+  content: ""; position: absolute; left: 13px; top: 30px; bottom: 2px; width: 2px; background: var(--line);
+}
+.cro-n {
+  flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent); color: var(--accent-ink); font: 650 .85rem/1 var(--sans); font-variant-numeric: tabular-nums;
+}
+.cro-body { flex: 1; min-width: 0; padding-top: 3px; }
+.cro-t { margin: 0; font-weight: 600; line-height: 1.4; color: var(--ink); }
+.cro-tag {
+  display: inline-block; margin-left: 8px; vertical-align: 1px; padding: 2px 9px; border-radius: 999px;
+  font: 650 .7rem/1.4 var(--sans); letter-spacing: .02em; color: var(--bad); background: var(--bad-soft);
+  border: 1px solid color-mix(in srgb, var(--bad) 35%, transparent);
+}
+.cro-det { margin: 2px 0 0; font-size: .9rem; color: var(--ink-2); }
+.cro-listas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-top: 10px; }
+.cro-lista, .cro-firm { padding: 10px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-2); }
+.cro-firm { margin-top: 10px; }
+.cro-lista h3, .cro-firm h3, .cro-box h3 {
+  margin: 0 0 4px; font: 650 .72rem/1.3 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2);
+}
+.cro-lista ol, .cro-firm ul { margin: 0; padding-left: 1.4em; font-size: .92rem; line-height: 1.55; }
+.cro-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; margin-top: 6px; }
+.cro-box { border: 1px solid color-mix(in srgb, var(--tone) 30%, var(--line)); border-radius: 8px; background: color-mix(in srgb, var(--tone-soft) 55%, var(--surface)); overflow: hidden; }
+.cro-box h3 { margin: 0; padding: 10px 14px 0; color: var(--tone); }
+.cro-box .reg-item { padding: 8px 14px; }
+@media (max-width: 760px) {
+  .cro { padding: 14px 14px 16px; }
+  .cro-tag { display: table; margin: 4px 0 0; }
+}
+@media print { .cro { box-shadow: none; break-inside: avoid; } }
