@@ -12,6 +12,37 @@ protección civil y mantenimiento). Se usa en laptop y en celular durante las me
   en cada push a `main` (1-2 minutos). El service worker revalida `index.html` y los JSON con el
   servidor; si alguien no ve un cambio, basta recargar (Ctrl+F5).
 
+## Cuando el usuario escriba "Analiza el proyecto"
+
+Es la forma de arrancar en una laptop nueva o en una sesión nueva. Hacer todo esto sin preguntar,
+salvo instalar programas, y **sin modificar archivos, sin commit y sin push**:
+
+1. **Herramientas.** Revisar que existan `git`, `node` (versión 22 o mayor), `npm` y `gh`, y que
+   `gh auth status` tenga sesión iniciada. Si falta algo, decir exactamente qué instalar (por ejemplo
+   `winget install Git.Git`, `winget install OpenJS.NodeJS.LTS`, `winget install GitHub.cli`) y
+   pedir permiso antes de instalar. Si falta la sesión de GitHub, pedir al usuario que corra
+   `gh auth login` (no escribir credenciales por él).
+2. **Repositorio.** Si la carpeta actual no es este repositorio, clonarlo con
+   `gh repo clone Zettlist/defensa-pliego-uami` y trabajar dentro de `defensa-pliego-uami`.
+   Si ya lo es, `git pull` para traer lo último. Si hay cambios sin commit, no tocarlos y avisar.
+3. **Identidad de git** (solo si no está configurada en el repo):
+   `git config user.name "Zettlist"` y
+   `git config user.email "169029606+Zettlist@users.noreply.github.com"`.
+4. **Dependencias y validación.** `npm ci` (o `npm install`), `npm run check` y `npm run build`.
+   Reportar cualquier ERROR con el texto exacto.
+5. **Contexto.** Leer este archivo completo, `docs/historial.md` y los últimos commits
+   (`git log --oneline -10`).
+6. **Prueba.** Levantar `npm run preview` (configuración `preview` de `.claude/launch.json`), abrir
+   `http://localhost:4173/#eje3-reglamento` y `#eje3-p3-4`, y confirmar que cargan sin errores en la
+   consola. Confirmar también que https://zettlist.github.io/defensa-pliego-uami/ responde y que su
+   `data.json` es igual al del repositorio.
+7. **Reporte al usuario**, breve y en español:
+   - si quedó todo listo o qué falta;
+   - versión de los datos (`fecha` de data.json), número de puntos y citas (lo dice `npm run check`);
+   - últimos cambios y pendientes de `docs/historial.md`;
+   - cómo seguir: "Publica este data.json nuevo: <ruta>", "marca el X como cumplido", "en el
+     Reglamento agrega…".
+
 ## Comunicación con el usuario
 - Siempre en español. Tono sobrio, de herramienta de trabajo. Nada de emojis en la app.
 - El usuario no es programador: explicar en términos simples qué cambió y dónde verlo, con la liga.

@@ -1,5 +1,14 @@
 # Defensa del pliego petitorio · UAM Iztapalapa
 
+> **Empezar en otra laptop o en una sesión nueva:** abre Claude Code en una carpeta vacía (o en la
+> carpeta de este proyecto) y escribe:
+>
+> **Analiza el proyecto https://github.com/Zettlist/defensa-pliego-uami**
+>
+> Claude revisa las herramientas, descarga el proyecto, instala, valida, lo prueba y te dice si
+> quedó listo. Las instrucciones que sigue están en [`CLAUDE.md`](CLAUDE.md), en la sección
+> *Cuando el usuario escriba "Analiza el proyecto"*.
+
 Herramienta de consulta para la mesa de diálogo (Ejes 1 y 3). Vite + React, sitio estático.
 **Todo el contenido está en `public/data.json`**; el código no trae texto del pliego.
 
