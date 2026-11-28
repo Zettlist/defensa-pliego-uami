@@ -31,10 +31,58 @@ npm run check      # revisa la estructura de data.json
 Sin GitHub (Netlify Drop): `npm run build` y arrastra la carpeta `dist` a https://app.netlify.com/drop
 (en el mismo sitio, desde *Deploys*, para conservar la liga).
 
+## Otros archivos de contenido
+
+- `public/estado.json`: puntos ya cumplidos (insignia "Cumplido").
+- `public/reglamento.json`: reglamento de las mesas (vista *Reglamento de las mesas* en Panorama).
+
+Van aparte de `data.json` para que publicar un `data.json` nuevo no los borre.
+
+## Pasar el proyecto a otra laptop
+
+1. Instala [Git](https://git-scm.com/download/win), [Node.js 22](https://nodejs.org/) y
+   [GitHub CLI](https://cli.github.com/). Luego, en PowerShell:
+
+   ```powershell
+   gh auth login
+   ```
+
+2. Clona el repositorio y prepara la carpeta:
+
+   ```powershell
+   gh repo clone Zettlist/defensa-pliego-uami
+   ```
+
+   ```powershell
+   cd defensa-pliego-uami
+   ```
+
+   ```powershell
+   git config user.name "Zettlist"
+   ```
+
+   ```powershell
+   git config user.email "169029606+Zettlist@users.noreply.github.com"
+   ```
+
+   ```powershell
+   npm install
+   ```
+
+3. Comprueba que todo funciona:
+
+   ```powershell
+   npm run build
+   ```
+
+4. Abre esa carpeta en Claude Code. `CLAUDE.md` le da todo el contexto (cómo publicar, qué archivos
+   van aparte y las reglas acordadas); `docs/historial.md` resume qué se hizo en cada etapa.
+
 ## Estructura
 
 - `src/lib.js`: búsqueda sin acentos, resaltado, ruteo por hash, utilidades.
-- `src/components/views.jsx`: Resumen, Punto, Debilidades, Verificación, Glosario, Advertencias.
+- `src/components/views.jsx`: Resumen, Punto, Debilidades, Verificación, Glosario, Advertencias, Reglamento.
+- `src/components/Checklist.jsx` y `Reportes.jsx`: checklist por punto y reportes de laboratorios (3.4).
 - `src/components/CitePanel.jsx`: panel de cita (frase exacta, por qué importa, abrir original).
-- `public/sw.js`: copia sin conexión (red primero para `index.html` y `data.json`).
-- `scripts/check-data.mjs`: validación de `data.json` (corre antes de cada build).
+- `public/sw.js`: copia sin conexión (red primero para `index.html` y los JSON).
+- `scripts/check-data.mjs`: validación de `data.json`, `estado.json` y `reglamento.json` (corre antes de cada build).
